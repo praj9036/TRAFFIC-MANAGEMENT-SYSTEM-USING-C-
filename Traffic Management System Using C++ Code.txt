@@ -1,0 +1,58 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <csignal>
+
+using namespace std;
+
+bool running = true;
+
+void signalHandler(int signum) {
+    cout << "\nInterrupt signal (" << signum << ") received. Stopping traffic management system...\n";
+    running = false;
+}
+
+void trafficSignal(string signal_color, int duration) {
+    cout << "Traffic Signal: " << signal_color << " - " << duration << " seconds\n";
+    this_thread::sleep_for(chrono::seconds(duration));
+}
+
+void manageTraffic(bool emergency = false) {
+    if (emergency) {
+        cout << "Emergency Vehicle Detected! Priority Given!\n";
+        trafficSignal("GREEN", 5);
+    } else {
+        trafficSignal("RED", 5);
+        trafficSignal("YELLOW", 2);
+        trafficSignal("GREEN", 5);
+    }
+}
+
+void trafficControlSystem() {
+    int choice;
+    while (running) {
+        cout << "\nTraffic Management System\n";
+        cout << "1. Normal Traffic Flow\n";
+        cout << "2. Emergency Vehicle Detected\n";
+        cout << "3. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+        
+        if (choice == 1) {
+            manageTraffic(false);
+        } else if (choice == 2) {
+            manageTraffic(true);
+        } else if (choice == 3) {
+            cout << "Exiting Traffic Management System...\n";
+            break;
+        } else {
+            cout << "Invalid choice! Try again.\n";
+        }
+    }
+}
+
+int main() {
+    signal(SIGINT, signalHandler); // Handle Ctrl+C (SIGINT)
+    trafficControlSystem();
+    return 0;
+}
